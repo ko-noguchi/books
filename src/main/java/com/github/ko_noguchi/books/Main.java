@@ -1,16 +1,16 @@
 package com.github.ko_noguchi.books;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Scanner;
 import java.util.function.Consumer;
 
 import static java.nio.file.StandardOpenOption.APPEND;
 import static java.nio.file.StandardOpenOption.CREATE;
-import static java.nio.file.StandardOpenOption.READ;
 
 public class Main {
   private static final String REGISTERER_PATH = "registerer.dat";
@@ -22,18 +22,22 @@ public class Main {
     reader.addHandler(new ExitCommandHandler());
 
     prompt();
-    try (InputStream registerer = Files.newInputStream(Paths.get(REGISTERER_PATH), READ);
+    try (Scanner scanner = new Scanner(System.in);
          OutputStream books = Files.newOutputStream(Paths.get(BOOKS_PATH), CREATE, APPEND)) {
-      try (Scanner scanner = new Scanner(System.in)) {
-        reader.addHandler(new InsertCommandHandler(scanner, System.out, registerer, books));
+      reader.addHandler(new InsertCommandHandler(scanner, readRegisterer(),
+              System.out, books, LocalDateTime::now, new UuidIdGenerator()));
 
-        while (scanner.hasNextLine()) {
-          reader.next(scanner.nextLine());
+      while (scanner.hasNextLine()) {
+        reader.next(scanner.nextLine());
 
-          prompt();
-        }
+        prompt();
       }
     }
+  }
+
+  private static String readRegisterer() throws IOException {
+    List<String> lines = Files.readAllLines(Paths.get(REGISTERER_PATH));
+    return lines.get(0);
   }
 
   private static void prompt() {

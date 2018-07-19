@@ -3,26 +3,37 @@ package com.github.ko_noguchi.books;
 import java.util.Objects;
 
 public class Book {
+  private final String id;
   private final String isbn;
   private final String bookName;
   private final String author;
   private final String publisher;
   private final String publicationDate;
   private final int price;
+  private final String createdBy;
+  private final String createdAt;
+  private final String updatedBy;
+  private final String updatedAt;
 
   static Builder builder() {
     return new Builder();
   }
 
   private Book(
-      String isbn, String bookName, String author,
-      String publisher, String publicationDate, int price) {
+      String id, String isbn, String bookName, String author,
+      String publisher, String publicationDate, int price,
+      String createdBy, String createdAt, String updatedBy, String updatedAt) {
+    this.id = id;
     this.isbn = isbn;
     this.bookName = bookName;
     this.author = author;
     this.publisher = publisher;
     this.publicationDate = publicationDate;
     this.price = price;
+    this.createdBy = createdBy;
+    this.createdAt = createdAt;
+    this.updatedBy = updatedBy;
+    this.updatedAt = updatedAt;
   }
 
   @Override
@@ -62,8 +73,9 @@ public class Book {
 
   String dump() {
     return String.join(",",
-            quote(isbn), quote(bookName), quote(author),
-            quote(publisher), quote(publicationDate), String.valueOf(price));
+        quote(id), quote(isbn), quote(bookName), quote(author),
+        quote(publisher), quote(publicationDate), String.valueOf(price),
+        quote(createdBy), quote(createdAt), quote(updatedBy), quote(updatedAt));
   }
 
   private static String quote(String text) {
@@ -77,6 +89,11 @@ public class Book {
     private String publisher;
     private String publicationDate;
     private int price;
+    private String id;
+    private String createdBy;
+    private String createdAt;
+    private String updatedBy;
+    private String updatedAt;
 
     private Builder() {
     }
@@ -111,8 +128,35 @@ public class Book {
       return this;
     }
 
+    Builder id(String id) {
+      this.id = id;
+      return this;
+    }
+
+    Builder createdBy(String createdBy) {
+      this.createdBy = createdBy;
+      return this;
+    }
+
+    Builder createdAt(String createdAt) {
+      this.createdAt = createdAt;
+      return this;
+    }
+
+    Builder updatedBy(String updatedBy) {
+      this.updatedBy = updatedBy;
+      return this;
+    }
+
+    Builder updatedAt(String updatedAt) {
+      this.updatedAt = updatedAt;
+      return this;
+    }
+
     Book build() {
-      return new Book(isbn, bookName, author, publisher, publicationDate, price);
+      return new Book(
+          id, isbn, bookName, author, publisher, publicationDate, price,
+          createdBy, createdAt, updatedBy, updatedAt);
     }
   }
 }

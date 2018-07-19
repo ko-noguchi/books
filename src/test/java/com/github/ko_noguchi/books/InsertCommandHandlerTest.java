@@ -3,10 +3,9 @@ package com.github.ko_noguchi.books;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Scanner;
 
@@ -15,20 +14,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class InsertCommandHandlerTest {
   private ByteArrayOutputStream consoleSpy;
-  private ByteArrayInputStream registererDummy;
   private ByteArrayOutputStream booksSpy;
+  private LocalDateTime now;
+  private ClockStub clockStub;
+  private IdGeneratorStub idGeneratorStub;
 
   @BeforeEach
   void setUp() {
     consoleSpy = new ByteArrayOutputStream();
-    registererDummy = new ByteArrayInputStream(new byte[0]);
     booksSpy = new ByteArrayOutputStream();
+    now = LocalDateTime.of(2018, 7, 19, 19, 40, 23, 123_000_000);
+    clockStub = new ClockStub(now);
+    idGeneratorStub = new IdGeneratorStub("stub-id");
   }
 
   @Test
   void match_matchesInsert() {
-    CommandHandler sut =
-            new InsertCommandHandler(new Scanner(""), consoleSpy, registererDummy, booksSpy);
+    CommandHandler sut = new InsertCommandHandler(
+            new Scanner(""), "", consoleSpy, booksSpy, clockStub, idGeneratorStub);
 
 
     assertThat(sut.match("insert")).isTrue();
@@ -36,8 +39,8 @@ class InsertCommandHandlerTest {
 
   @Test
   void match_matchesInsertIgnoringCase() {
-    CommandHandler sut =
-            new InsertCommandHandler(new Scanner(""), consoleSpy, registererDummy, booksSpy);
+    CommandHandler sut = new InsertCommandHandler(
+            new Scanner(""), "", consoleSpy, booksSpy, clockStub, idGeneratorStub);
 
 
     assertThat(sut.match("inSerT")).isTrue();
@@ -45,8 +48,8 @@ class InsertCommandHandlerTest {
 
   @Test
   void match_doesNotMatchOtherThanInsert() {
-    CommandHandler sut =
-        new InsertCommandHandler(new Scanner(""), consoleSpy, registererDummy, booksSpy);
+    CommandHandler sut = new InsertCommandHandler(
+            new Scanner(""), "", consoleSpy, booksSpy, clockStub, idGeneratorStub);
 
 
     assertThat(sut.match("not insert")).isFalse();
@@ -69,7 +72,9 @@ class InsertCommandHandlerTest {
             "出版日を入力",
             "価格を入力",
             "書籍を登録"),
-        "'9784866211305','これは本です','これは著者です','犬々社','20180322',1620" + System.lineSeparator());
+        "'stub-id','9784866211305','これは本です','これは著者です','犬々社','20180322',1620," +
+                "'Registererです。','20180719 194023.123','Registererです。','20180719 194023.123'" +
+                System.lineSeparator());
   }
 
   @Test
@@ -103,16 +108,17 @@ class InsertCommandHandlerTest {
             "価格は",
             "価格を入力",
             "書籍を登録"),
-            "'9784866211305','これは本です','これは著者です','犬々社','20180322',1620" + System.lineSeparator());
+            "'stub-id','9784866211305','これは本です','これは著者です','犬々社','20180322',1620," +
+                    "'Registererです。','20180719 194023.123','Registererです。','20180719 194023.123'" +
+                    System.lineSeparator());
   }
 
   private void handle_handlesInsertion(
       List<String> inputs, List<String> consoleOutputs, String fileOutput) throws IOException {
     String joinedInput = String.join(System.lineSeparator(), inputs);
-    InputStream registererStub = new ByteArrayInputStream("登録者です。".getBytes());
 
-    CommandHandler sut =
-        new InsertCommandHandler(new Scanner(joinedInput), consoleSpy, registererStub, booksSpy);
+    CommandHandler sut = new InsertCommandHandler(new Scanner(joinedInput),
+            "Registererです。", consoleSpy, booksSpy, clockStub, idGeneratorStub);
 
 
     sut.handle("insert");
