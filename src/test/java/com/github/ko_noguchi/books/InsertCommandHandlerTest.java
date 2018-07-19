@@ -28,10 +28,19 @@ class InsertCommandHandlerTest {
   @Test
   void match_matchesInsert() {
     CommandHandler sut =
-        new InsertCommandHandler(new Scanner(""), consoleSpy, registererDummy, booksSpy);
+            new InsertCommandHandler(new Scanner(""), consoleSpy, registererDummy, booksSpy);
 
 
     assertThat(sut.match("insert")).isTrue();
+  }
+
+  @Test
+  void match_matchesInsertIgnoringCase() {
+    CommandHandler sut =
+            new InsertCommandHandler(new Scanner(""), consoleSpy, registererDummy, booksSpy);
+
+
+    assertThat(sut.match("inSerT")).isTrue();
   }
 
   @Test

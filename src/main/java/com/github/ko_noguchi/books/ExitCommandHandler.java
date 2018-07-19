@@ -3,7 +3,7 @@ package com.github.ko_noguchi.books;
 public class ExitCommandHandler implements CommandHandler {
   @Override
   public boolean match(String line) {
-    return line.equals("exit");
+    return line.equalsIgnoreCase("exit");
   }
 
   @Override

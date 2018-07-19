@@ -19,6 +19,11 @@ class ExitCommandHandlerTest {
   }
 
   @Test
+  void match_matchesExitIgnoringCase() {
+    assertThat(sut.match("ExIt")).isTrue();
+  }
+
+  @Test
   void match_doesNotMatchOtherThanInsert() {
     assertThat(sut.match("not exit")).isFalse();
   }

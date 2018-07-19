@@ -21,7 +21,7 @@ public class InsertCommandHandler implements CommandHandler {
 
   @Override
   public boolean match(String line) {
-    return line.equals("insert");
+    return line.equalsIgnoreCase("insert");
   }
 
   @Override
