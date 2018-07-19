@@ -69,7 +69,7 @@ class InsertCommandHandlerTest {
             "出版日を入力",
             "価格を入力",
             "書籍を登録"),
-        "9784866211305,これは本です,これは著者です,犬々社,20180322,1620" + System.lineSeparator());
+        "'9784866211305','これは本です','これは著者です','犬々社','20180322',1620" + System.lineSeparator());
   }
 
   @Test
@@ -103,7 +103,7 @@ class InsertCommandHandlerTest {
             "価格は",
             "価格を入力",
             "書籍を登録"),
-        "9784866211305,これは本です,これは著者です,犬々社,20180322,1620" + System.lineSeparator());
+            "'9784866211305','これは本です','これは著者です','犬々社','20180322',1620" + System.lineSeparator());
   }
 
   private void handle_handlesInsertion(

@@ -9,11 +9,12 @@ import java.util.Scanner;
 import java.util.function.Consumer;
 
 import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.READ;
 
 public class Main {
   private static final String REGISTERER_PATH = "registerer.dat";
-  private static final String BOOKS_PATH = "books.dat";
+  private static final String BOOKS_PATH = "books.csv";
   private static final Consumer<String> DEFAULT_HANDLER = l -> System.out.println("無効な入力です: " + l);
 
   public static void main(String[] args) throws IOException {
@@ -22,7 +23,7 @@ public class Main {
 
     prompt();
     try (InputStream registerer = Files.newInputStream(Paths.get(REGISTERER_PATH), READ);
-         OutputStream books = Files.newOutputStream(Paths.get(BOOKS_PATH), APPEND)) {
+         OutputStream books = Files.newOutputStream(Paths.get(BOOKS_PATH), CREATE, APPEND)) {
       try (Scanner scanner = new Scanner(System.in)) {
         reader.addHandler(new InsertCommandHandler(scanner, System.out, registerer, books));
 

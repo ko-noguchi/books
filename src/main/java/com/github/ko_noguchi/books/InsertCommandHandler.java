@@ -47,7 +47,7 @@ public class InsertCommandHandler implements CommandHandler {
     }
 
     Book book = bookBuilder.build();
-    books.write((book + System.lineSeparator()).getBytes());
+    books.write((book.dump() + System.lineSeparator()).getBytes());
   }
 
   private void prompt(InsertState state) throws IOException {

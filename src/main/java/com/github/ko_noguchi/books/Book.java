@@ -50,8 +50,24 @@ public class Book {
 
   @Override
   public String toString() {
+    return "Book{" +
+            "isbn='" + isbn + '\'' +
+            ", bookName='" + bookName + '\'' +
+            ", author='" + author + '\'' +
+            ", publisher='" + publisher + '\'' +
+            ", publicationDate='" + publicationDate + '\'' +
+            ", price=" + price +
+            '}';
+  }
+
+  String dump() {
     return String.join(",",
-        isbn, bookName, author, publisher, publicationDate, String.valueOf(price));
+            quote(isbn), quote(bookName), quote(author),
+            quote(publisher), quote(publicationDate), String.valueOf(price));
+  }
+
+  private static String quote(String text) {
+    return "'" + text.replace("'", "''") + "'";
   }
 
   static class Builder {
