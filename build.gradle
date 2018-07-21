@@ -1,6 +1,7 @@
 buildscript {}
 
 apply plugin: 'java'
+apply plugin: 'application'
 
 jar {
     baseName = 'books'
@@ -16,6 +17,8 @@ sourceCompatibility = '1.8'
 compileJava.options.encoding = 'UTF-8'
 compileTestJava.options.encoding = 'UTF-8'
 
+mainClassName = "com.github.ko_noguchi.books.Main"
+
 jar {
     manifest {
         attributes 'Main-Class': 'com.github.ko_noguchi.books.Main'
@@ -23,6 +26,8 @@ jar {
 }
 
 dependencies {
+    compile('org.apache.commons:commons-csv:1.5')
+
     testCompile('org.junit.platform:junit-platform-launcher:1.2.0')
     testCompile('org.junit.jupiter:junit-jupiter-api:5.2.0')
     testCompile('org.junit.jupiter:junit-jupiter-engine:5.2.0')

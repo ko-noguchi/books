@@ -24,7 +24,7 @@ public class Main {
     prompt();
     try (Scanner scanner = new Scanner(System.in);
          OutputStream books = Files.newOutputStream(Paths.get(BOOKS_PATH), CREATE, APPEND)) {
-      reader.addHandler(new InsertCommandHandler(scanner, readRegisterer(),
+      reader.addHandler(new InsertCommandHandler(readRegisterer(),
               System.out, books, LocalDateTime::now, new UuidIdGenerator()));
 
       while (scanner.hasNextLine()) {

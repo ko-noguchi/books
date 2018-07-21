@@ -3,23 +3,19 @@ package com.github.ko_noguchi.books;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.time.format.DateTimeFormatter;
-import java.util.Scanner;
 
 public class InsertCommandHandler implements CommandHandler {
   private static final DateTimeFormatter DATE_TIME_FORMATTER =
       DateTimeFormatter.ofPattern("YYYYMMdd HHmmss.SSS");
 
-  private final Scanner scanner;
   private final String registerer;
   private final OutputStream console;
   private final OutputStream books;
   private final Clock clock;
   private final IdGenerator idGenerator;
 
-  InsertCommandHandler(
-      Scanner scanner, String registerer, OutputStream console, OutputStream books,
-      Clock clock, IdGenerator idGenerator) {
-    this.scanner = scanner;
+  InsertCommandHandler(String registerer, OutputStream console, OutputStream books,
+                       Clock clock, IdGenerator idGenerator) {
     this.registerer = registerer;
     this.console = console;
     this.books = books;
@@ -29,53 +25,37 @@ public class InsertCommandHandler implements CommandHandler {
 
   @Override
   public boolean match(String line) {
-    return line.equalsIgnoreCase("insert");
+    String command = line.replaceAll(" .+$", "");
+    return command.equalsIgnoreCase("insert");
   }
 
   @Override
   public void handle(String line) throws IOException {
-    Book.Builder bookBuilder = Book.builder();
-    InsertState current = InsertState.ISBN;
+    String argument = line.replaceFirst(".+ ", "");
 
-    prompt(current);
-    while (scanner.hasNextLine()) {
-      current = current.next(scanner.nextLine(), bookBuilder);
+    try {
+      Book.Builder bookBuilder = Book.builderWith(argument);
+      fillAutoRegisteredItems(bookBuilder);
 
-      if (current == InsertState.COMPLETE) {
-        writeToConsole(current.text());
-        break;
-      }
-
-      if (current.isError()) {
-        writeToConsole(current.text() + System.lineSeparator());
-        current = current.next("", bookBuilder);
-      }
-
-      prompt(current);
+      writeLine(books, bookBuilder.build().dump());
+      writeLine(console, "書籍を登録しました。");
+    } catch (BookFormatException e) {
+      writeLine(console, e.getMessage());
     }
-
-    appendAutoRegisteredItems(bookBuilder);
-
-    Book book = bookBuilder.build();
-    books.write((book.dump() + System.lineSeparator()).getBytes());
   }
 
-  private void appendAutoRegisteredItems(Book.Builder bookBuilder) {
+  private static void writeLine(OutputStream os, String text) throws IOException {
+    os.write((text + System.lineSeparator()).getBytes());
+  }
+
+  private void fillAutoRegisteredItems(Book.Builder bookBuilder) {
     String now = DATE_TIME_FORMATTER.format(clock.now());
 
     bookBuilder
-            .id(idGenerator.generate16CharacterId())
-            .createdBy(registerer)
-            .createdAt(now)
-            .updatedBy(registerer)
-            .updatedAt(now);
-  }
-
-  private void prompt(InsertState state) throws IOException {
-    writeToConsole(state.text() + ": ");
-  }
-
-  private void writeToConsole(String text) throws IOException {
-    console.write(text.getBytes());
+        .id(idGenerator.generate16CharacterId())
+        .createdBy(registerer)
+        .createdAt(now)
+        .updatedBy(registerer)
+        .updatedAt(now);
   }
 }

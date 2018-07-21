@@ -1,8 +1,14 @@
 package com.github.ko_noguchi.books;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
-public class Book {
+class Book {
+  private static final Pattern YYYYMMDD = Pattern.compile("^\\d{8}$");
+  private static final Pattern PRICE = Pattern.compile("^\\d{1,9}$");
+
   private final String id;
   private final String isbn;
   private final String bookName;
@@ -17,6 +23,42 @@ public class Book {
 
   static Builder builder() {
     return new Builder();
+  }
+
+  static Builder builderWith(String text) throws IOException {
+    Builder builder = new Builder();
+
+    List<String> csv = CsvUtils.parse(text);
+    if (csv.size() != 6) {
+      throw new BookFormatException(
+          "本の情報は次の形式で入力してください: '<ISBN>','<書籍名>','<著者名>','<出版社>','<出版日>',<価格>");
+    }
+
+    return builder
+        .isbn(getLengthBoundString(csv, 0, 13, "ISBN"))
+        .bookName(getLengthBoundString(csv, 1, 50, "書籍名"))
+        .author(getLengthBoundString(csv, 2, 30, "著者名"))
+        .publisher(getLengthBoundString(csv, 3, 30, "出版社"))
+        .publicationDate(getPatternMatchingString(csv, 4, YYYYMMDD, "出版日", "YYYYMMDDの形式"))
+        .price(Integer.parseInt(getPatternMatchingString(csv, 5, PRICE, "価格", "9桁以内の数値")));
+  }
+
+  private static String getLengthBoundString(
+      List<String> csv, int index, int maxLength, String name) {
+    String item = csv.get(index);
+    if (item.length() > maxLength) {
+      throw new BookFormatException(String.format("%s[%s]は%d桁以内で入力してください", name, item, maxLength));
+    }
+    return item;
+  }
+
+  private static String getPatternMatchingString(
+      List<String> csv, int index, Pattern pattern, String name, String format) {
+    String item = csv.get(index);
+    if (!pattern.matcher(item).matches()) {
+      throw new BookFormatException(String.format("%s[%s]は%sで入力してください", name, item, format));
+    }
+    return item;
   }
 
   private Book(
@@ -34,6 +76,12 @@ public class Book {
     this.createdAt = createdAt;
     this.updatedBy = updatedBy;
     this.updatedAt = updatedAt;
+  }
+
+  String dump() throws IOException {
+    return CsvUtils.toCsv(
+        id, isbn, bookName, author, publisher, publicationDate, price,
+        createdBy, createdAt, updatedBy, updatedAt);
   }
 
   @Override
@@ -61,25 +109,19 @@ public class Book {
 
   @Override
   public String toString() {
-    return "Book{" +
-            "isbn='" + isbn + '\'' +
-            ", bookName='" + bookName + '\'' +
-            ", author='" + author + '\'' +
-            ", publisher='" + publisher + '\'' +
-            ", publicationDate='" + publicationDate + '\'' +
-            ", price=" + price +
-            '}';
-  }
-
-  String dump() {
-    return String.join(",",
-        quote(id), quote(isbn), quote(bookName), quote(author),
-        quote(publisher), quote(publicationDate), String.valueOf(price),
-        quote(createdBy), quote(createdAt), quote(updatedBy), quote(updatedAt));
-  }
-
-  private static String quote(String text) {
-    return "'" + text.replace("'", "''") + "'";
+    return "Book{"
+        + "id='" + id + '\''
+        + ", isbn='" + isbn + '\''
+        + ", bookName='" + bookName + '\''
+        + ", author='" + author + '\''
+        + ", publisher='" + publisher + '\''
+        + ", publicationDate='" + publicationDate + '\''
+        + ", price=" + price
+        + ", createdBy='" + createdBy + '\''
+        + ", createdAt='" + createdAt + '\''
+        + ", updatedBy='" + updatedBy + '\''
+        + ", updatedAt='" + updatedAt + '\''
+        + '}';
   }
 
   static class Builder {
