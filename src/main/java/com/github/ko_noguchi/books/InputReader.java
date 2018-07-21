@@ -6,25 +6,25 @@ import java.util.List;
 import java.util.function.Consumer;
 
 class InputReader {
-  private final Consumer<String> defaultHandler;
-  private final List<CommandHandler> commandHandlers = new ArrayList<>();
+    private final Consumer<String> defaultHandler;
+    private final List<CommandHandler> commandHandlers = new ArrayList<>();
 
-  InputReader(Consumer<String> defaultHandler) {
-    this.defaultHandler = defaultHandler;
-  }
-
-  void next(String line) throws IOException {
-    for (CommandHandler handler : commandHandlers) {
-      if (handler.match(line)) {
-        handler.handle(line);
-        return;
-      }
+    InputReader(Consumer<String> defaultHandler) {
+        this.defaultHandler = defaultHandler;
     }
 
-    defaultHandler.accept(line);
-  }
+    void next(String line) throws IOException {
+        for (CommandHandler handler : commandHandlers) {
+            if (handler.match(line)) {
+                handler.handle(line);
+                return;
+            }
+        }
 
-  void addHandler(CommandHandler commandHandler) {
-    commandHandlers.add(commandHandler);
-  }
+        defaultHandler.accept(line);
+    }
+
+    void addHandler(CommandHandler commandHandler) {
+        commandHandlers.add(commandHandler);
+    }
 }

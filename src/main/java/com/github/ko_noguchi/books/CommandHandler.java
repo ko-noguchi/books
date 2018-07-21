@@ -3,7 +3,7 @@ package com.github.ko_noguchi.books;
 import java.io.IOException;
 
 public interface CommandHandler {
-  boolean match(String line);
+    boolean match(String line);
 
-  void handle(String line) throws IOException;
+    void handle(String line) throws IOException;
 }
