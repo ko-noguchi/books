@@ -1,16 +1,12 @@
 package com.github.ko_noguchi.books;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Scanner;
 import java.util.function.Consumer;
-
-import static java.nio.file.StandardOpenOption.APPEND;
-import static java.nio.file.StandardOpenOption.CREATE;
 
 public class Main {
     private static final String REGISTERER_PATH = "registerer.dat";
@@ -21,11 +17,14 @@ public class Main {
         InputReader reader = new InputReader(DEFAULT_HANDLER);
         reader.addHandler(new ExitCommandHandler());
 
+        Books books = StreamBooks.parse(
+                Files.readAllLines(Paths.get(BOOKS_PATH)), () -> Files.newOutputStream(Paths.get(BOOKS_PATH)));
+
         prompt();
-        try (Scanner scanner = new Scanner(System.in);
-             OutputStream books = Files.newOutputStream(Paths.get(BOOKS_PATH), CREATE, APPEND)) {
-            reader.addHandler(new InsertCommandHandler(readRegisterer(),
-                    System.out, books, LocalDateTime::now, new UuidIdGenerator()));
+        try (Scanner scanner = new Scanner(System.in)) {
+            reader.addHandler(new InsertCommandHandler(
+                    readRegisterer(), System.out, books, LocalDateTime::now, new UuidIdGenerator()));
+            reader.addHandler(new DeleteCommandHandler(System.out, books));
 
             while (scanner.hasNextLine()) {
                 reader.next(scanner.nextLine());

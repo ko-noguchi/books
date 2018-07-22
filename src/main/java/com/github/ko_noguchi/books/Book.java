@@ -21,20 +21,39 @@ class Book {
     private final String updatedBy;
     private final String updatedAt;
 
+    static Book parse(String text) throws IOException {
+        List<String> csv = CsvUtils.parse(text);
+        return builder()
+                .id(csv.get(0))
+                .isbn(csv.get(1))
+                .bookName(csv.get(2))
+                .author(csv.get(3))
+                .publisher(csv.get(4))
+                .publicationDate(csv.get(5))
+                .price(Integer.parseInt(csv.get(6)))
+                .createdBy(csv.get(7))
+                .createdAt(csv.get(8))
+                .updatedBy(csv.get(9))
+                .updatedAt(csv.get(10))
+                .build();
+    }
+
     static Builder builder() {
         return new Builder();
     }
 
-    static Builder builderWith(String text) throws IOException {
-        Builder builder = new Builder();
-
+    static Builder builderForInsertion(String text) throws IOException {
         List<String> csv = CsvUtils.parse(text);
         if (csv.size() != 6) {
             throw new BookFormatException(
                     "本の情報は次の形式で入力してください: '<ISBN>','<書籍名>','<著者名>','<出版社>','<出版日>',<価格>");
         }
 
-        return builder
+        return builderForInsertion(csv);
+    }
+
+    private static Builder builderForInsertion(List<String> csv) {
+        return new Builder()
                 .isbn(getLengthBoundString(csv, 0, 13, "ISBN"))
                 .bookName(getLengthBoundString(csv, 1, 50, "書籍名"))
                 .author(getLengthBoundString(csv, 2, 30, "著者名"))
@@ -76,6 +95,10 @@ class Book {
         this.createdAt = createdAt;
         this.updatedBy = updatedBy;
         this.updatedAt = updatedAt;
+    }
+
+    String getId() {
+        return id;
     }
 
     String dump() throws IOException {

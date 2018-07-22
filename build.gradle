@@ -27,6 +27,7 @@ jar {
 
 dependencies {
     compile('org.apache.commons:commons-csv:1.5')
+    compile('commons-io:commons-io:2.6')
 
     testCompile('org.junit.platform:junit-platform-launcher:1.2.0')
     testCompile('org.junit.jupiter:junit-jupiter-api:5.2.0')

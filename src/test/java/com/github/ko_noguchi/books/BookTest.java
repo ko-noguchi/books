@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class BookTest {
     @Test
     void builderWith_createsBookBuilderWithArgument() throws IOException {
-        Book book = Book.builderWith("'9784866211305','これは本です','これは著者です','犬々社','20180322',1620").build();
+        Book book = Book.builderForInsertion("'9784866211305','これは本です','これは著者です','犬々社','20180322',1620").build();
 
 
         Book expected = Book.builder()
@@ -26,7 +26,7 @@ class BookTest {
 
     @Test
     void builderWith_createsBookBuilderWithArgumentUnescapingSingleQuotations() throws IOException {
-        Book book = Book.builderWith("'9784866211305','That''s it','Ma''am','R''n''B','20180322',1620").build();
+        Book book = Book.builderForInsertion("'9784866211305','That''s it','Ma''am','R''n''B','20180322',1620").build();
 
 
         Book expected = Book.builder()
@@ -42,21 +42,21 @@ class BookTest {
 
     @Test
     void builderWith_throwsExceptionWhenThereIsNotSixItems() {
-        assertThatThrownBy(() -> Book.builderWith("9784866211305,これは本です,これは著者です,犬々社,20180322"))
+        assertThatThrownBy(() -> Book.builderForInsertion("9784866211305,これは本です,これは著者です,犬々社,20180322"))
                 .isInstanceOf(BookFormatException.class)
                 .hasMessage("本の情報は次の形式で入力してください: '<ISBN>','<書籍名>','<著者名>','<出版社>','<出版日>',<価格>");
     }
 
     @Test
     void builderWith_throwsExceptionWhenIsbnIsTooLong() {
-        assertThatThrownBy(() -> Book.builderWith("97848662113056,これは本です,これは著者です,犬々社,20180322,1620"))
+        assertThatThrownBy(() -> Book.builderForInsertion("97848662113056,これは本です,これは著者です,犬々社,20180322,1620"))
                 .isInstanceOf(BookFormatException.class)
                 .hasMessage("ISBN[97848662113056]は13桁以内で入力してください");
     }
 
     @Test
     void builderWith_throwsExceptionWhenBookNameIsTooLong() {
-        assertThatThrownBy(() -> Book.builderWith(
+        assertThatThrownBy(() -> Book.builderForInsertion(
                 "9784866211305,123456789012345678901234567890123456789012345678901,これは著者です,犬々社,20180322,1620"))
                 .isInstanceOf(BookFormatException.class)
                 .hasMessage("書籍名[123456789012345678901234567890123456789012345678901]は50桁以内で入力してください");
@@ -64,7 +64,7 @@ class BookTest {
 
     @Test
     void builderWith_throwsExceptionWhenAuthorIsTooLong() {
-        assertThatThrownBy(() -> Book.builderWith(
+        assertThatThrownBy(() -> Book.builderForInsertion(
                 "9784866211305,これは本です,1234567890123456789012345678901,犬々社,20180322,1620"))
                 .isInstanceOf(BookFormatException.class)
                 .hasMessage("著者名[1234567890123456789012345678901]は30桁以内で入力してください");
@@ -72,7 +72,7 @@ class BookTest {
 
     @Test
     void builderWith_throwsExceptionWhenPublisherIsTooLong() {
-        assertThatThrownBy(() -> Book.builderWith(
+        assertThatThrownBy(() -> Book.builderForInsertion(
                 "9784866211305,これは本です,これは著者です,1234567890123456789012345678901,20180322,1620"))
                 .isInstanceOf(BookFormatException.class)
                 .hasMessage("出版社[1234567890123456789012345678901]は30桁以内で入力してください");
@@ -80,21 +80,21 @@ class BookTest {
 
     @Test
     void builderWith_throwsExceptionWhenPublicationDateIsNotInFormatOfYYYYMMDD() {
-        assertThatThrownBy(() -> Book.builderWith("9784866211305,これは本です,これは著者です,犬々社,123456789,1620"))
+        assertThatThrownBy(() -> Book.builderForInsertion("9784866211305,これは本です,これは著者です,犬々社,123456789,1620"))
                 .isInstanceOf(BookFormatException.class)
                 .hasMessage("出版日[123456789]はYYYYMMDDの形式で入力してください");
     }
 
     @Test
     void builderWith_throwsExceptionWhenPriceIsNotANumber() {
-        assertThatThrownBy(() -> Book.builderWith("9784866211305,これは本です,これは著者です,犬々社,20180322,abc"))
+        assertThatThrownBy(() -> Book.builderForInsertion("9784866211305,これは本です,これは著者です,犬々社,20180322,abc"))
                 .isInstanceOf(BookFormatException.class)
                 .hasMessage("価格[abc]は9桁以内の数値で入力してください");
     }
 
     @Test
     void builderWith_throwsExceptionWhenPriceExceedsNineDigits() {
-        assertThatThrownBy(() -> Book.builderWith("9784866211305,これは本です,これは著者です,犬々社,20180322,1234567890"))
+        assertThatThrownBy(() -> Book.builderForInsertion("9784866211305,これは本です,これは著者です,犬々社,20180322,1234567890"))
                 .isInstanceOf(BookFormatException.class)
                 .hasMessage("価格[1234567890]は9桁以内の数値で入力してください");
     }

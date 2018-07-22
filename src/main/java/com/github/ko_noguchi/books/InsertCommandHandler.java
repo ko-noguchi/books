@@ -4,17 +4,19 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.time.format.DateTimeFormatter;
 
+import static com.github.ko_noguchi.books.CommandHandlerUtils.writeLine;
+
 public class InsertCommandHandler implements CommandHandler {
     private static final DateTimeFormatter DATE_TIME_FORMATTER =
             DateTimeFormatter.ofPattern("YYYYMMdd HHmmss.SSS");
 
     private final String registerer;
     private final OutputStream console;
-    private final OutputStream books;
+    private final Books books;
     private final Clock clock;
     private final IdGenerator idGenerator;
 
-    InsertCommandHandler(String registerer, OutputStream console, OutputStream books,
+    InsertCommandHandler(String registerer, OutputStream console, Books books,
                          Clock clock, IdGenerator idGenerator) {
         this.registerer = registerer;
         this.console = console;
@@ -34,18 +36,16 @@ public class InsertCommandHandler implements CommandHandler {
         String argument = line.replaceFirst(".+ ", "");
 
         try {
-            Book.Builder bookBuilder = Book.builderWith(argument);
+            Book.Builder bookBuilder = Book.builderForInsertion(argument);
             fillAutoRegisteredItems(bookBuilder);
 
-            writeLine(books, bookBuilder.build().dump());
+            books.insert(bookBuilder.build());
+            books.commit();
+
             writeLine(console, "書籍を登録しました。");
         } catch (BookFormatException e) {
             writeLine(console, e.getMessage());
         }
-    }
-
-    private static void writeLine(OutputStream os, String text) throws IOException {
-        os.write((text + System.lineSeparator()).getBytes());
     }
 
     private void fillAutoRegisteredItems(Book.Builder bookBuilder) {
