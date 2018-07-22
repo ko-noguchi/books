@@ -49,10 +49,6 @@ class Book {
                     "本の情報は次の形式で入力してください: '<ISBN>','<書籍名>','<著者名>','<出版社>','<出版日>',<価格>");
         }
 
-        return builderForInsertion(csv);
-    }
-
-    private static Builder builderForInsertion(List<String> csv) {
         return new Builder()
                 .isbn(getLengthBoundString(csv, 0, 13, "ISBN"))
                 .bookName(getLengthBoundString(csv, 1, 50, "書籍名"))
