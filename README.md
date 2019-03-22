@@ -10,5 +10,5 @@
 PowerShellで実行します。
 
 ```
-PS > buildAndRun.bat
+PS > buildAndRun.ps1
 ```
